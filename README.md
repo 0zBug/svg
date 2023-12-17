@@ -9,3 +9,5 @@ Line.style = "stroke:blue;stroke-width:5"
 
 writefile("test.svg", Drawing)
 ```
+
+![result](https://raw.githubusercontent.com/0zBug/svg/main/test2.svg)
