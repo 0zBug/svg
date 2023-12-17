@@ -1,13 +1,13 @@
 
 local Element
-function Element(Parent)
+function Element(Parent, Indent)
     return function(Class)
         local Object = {}
         local Children = {}
 
         table.insert(Parent, Object)
         
-        local new = Element(Children)
+        local new = Element(Children, Indent + 1)
 
         return setmetatable(Object, {
             __index = function(self, index)
@@ -24,11 +24,17 @@ function Element(Parent)
                     table.insert(Attributes, string.format("%s = \"%s\"", Attribute, Value))
                 end
 
-                for _, Child in next, Children do
-                    table.insert(Descendants, tostring(Child))
+                if #Children > 0 then
+                    for _, Child in next, Children do
+                        table.insert(Descendants, tostring(Child))
+                    end
                 end
 
-                return string.format("<%s %s>%s</%s>", Class, table.concat(Attributes, " "), table.concat(Descendants, "\n"), Class)
+                local String = string.format(string.gsub("\t<%s", "\t", string.rep("\t", Indent)), Class)
+                String = String .. (#Attributes > 0 and (" " .. table.concat(Attributes, " ")) or "")
+                String = String .. (#Children > 0 and string.format(string.gsub(">\n%s\t</%s>\n", "\t", string.rep("\t", Indent)), table.concat(Descendants), Class) or "/>\n")
+                
+                return  String
             end
         })
     end
@@ -39,7 +45,7 @@ return {
         local svg = {}
 
         return setmetatable({
-            new = Element(svg)
+            new = Element(svg, 1)
         }, {
             __tostring = function()
                 local Objects = {}
@@ -48,7 +54,7 @@ return {
                     table.insert(Objects, tostring(Object))
                 end
 
-                return string.format("<svg>\n%s\n</svg>", table.concat(Objects, "\n"))
+                return string.format("<svg>\n%s</svg>", table.concat(Objects))
             end
         })
     end
