@@ -1,4 +1,17 @@
 
+local Transformations = {
+    moveTo = "m%s,%s", -- x, y
+    lineTo = "l%s,%s", -- x, y
+    hLineTo = "h%s", -- x
+    vLineTo = "v%s", -- y
+    curveTo = "c%s,%s %s,%s %s,%s", -- x1, y1, x2, y2, x, y
+    sCurveTo = "s%s,%s %s,%s", -- x2, y2, x, y
+    qCurveTo = "q%s,%s %s,%s", -- x1, y1, x, y
+    sqCurveTo = "t%s,%s", -- x, y
+    archTo = "a%s,%s %s %s,%s %s,%s", -- rx, ry, rotation, largeFlag, sweepFlag, x, y
+    close = "z"
+}
+
 local Element
 function Element(Parent, Indent)
     return function(Class)
@@ -57,5 +70,23 @@ return {
                 return string.format("<svg>\n%s</svg>", table.concat(Objects))
             end
         })
-    end
+    end,
+    path = {
+        new = function()
+            local Path = {}
+
+            return setmetatable(Path, {
+                __index = function(self, Index)
+                    return function(self, ...)
+                        table.insert(Path, string.format(Transformations[Index], ...))
+
+                        return Index == "close" and tostring(Path) or Path
+                    end
+                end,
+                __tostring = function()
+                    return table.concat(Path)
+                end
+            })
+        end
+    }
 }
