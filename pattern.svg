@@ -1,0 +1,9 @@
+<svg>
+<defs ><linearGradient id = "Gradient1"><stop offset = "5%" stop-color = "white"></stop>
+<stop offset = "95%" stop-color = "blue"></stop></linearGradient>
+<linearGradient id = "Gradient2"><stop offset = "5%" stop-color = "red"></stop>
+<stop offset = "95%" stop-color = "orange"></stop></linearGradient>
+<pattern y = "0" x = "0" id = "Pattern" height = "0.25" width = "0.25"><rect y = "0" x = "0" height = "25" fill = "url(#Gradient2)" width = "25"></rect>
+<circle cy = "25" cx = "25" fill-opacity = "0.5" r = "20" fill = "url(#Gradient1)"></circle></pattern></defs>
+<rect height = "200" fill = "url(#Pattern)" width = "200"></rect>
+</svg>
