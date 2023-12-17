@@ -1,4 +1,4 @@
-
+```lua
 local Drawing = svg.new()
 local Line = Drawing.new("line")
 Line.x1 = 0
@@ -8,3 +8,4 @@ Line.y2 = 100
 Line.style = "stroke:blue;stroke-width:5"
 
 writefile("test.svg", Drawing)
+```
