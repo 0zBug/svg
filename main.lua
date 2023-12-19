@@ -5,6 +5,7 @@ local Transformations = {
     hLineTo = "h%s", -- x
     vLineTo = "v%s", -- y
     curveTo = "c%s,%s %s,%s %s,%s", -- x1, y1, x2, y2, x, y
+    
     sCurveTo = "s%s,%s %s,%s", -- x2, y2, x, y
     qCurveTo = "q%s,%s %s,%s", -- x1, y1, x, y
     sqCurveTo = "t%s,%s", -- x, y
@@ -14,7 +15,7 @@ local Transformations = {
 
 local Element
 function Element(Parent, Indent)
-    return function(Class)
+    return function(Class, Value)
         local Object = {}
         local Children = {}
 
@@ -34,7 +35,7 @@ function Element(Parent, Indent)
                 local Descendants = {}
 
                 for Attribute, Value in next, Object do
-                    table.insert(Attributes, string.format("%s = \"%s\"", Attribute, Value))
+                    table.insert(Attributes, string.format("%s = \"%s\"", Attribute, tostring(Value)))
                 end
 
                 if #Children > 0 then
@@ -45,7 +46,7 @@ function Element(Parent, Indent)
 
                 local String = string.format(string.gsub("\t<%s", "\t", string.rep("\t", Indent)), Class)
                 String = String .. (#Attributes > 0 and (" " .. table.concat(Attributes, " ")) or "")
-                String = String .. (#Children > 0 and string.format(string.gsub(">\n%s\t</%s>\n", "\t", string.rep("\t", Indent)), table.concat(Descendants), Class) or "/>\n")
+                String = String .. ((#Children > 0 or Value) and string.format(string.gsub(">\n%s\t</%s>\n", "\t", string.rep("\t", Indent)), Value and Value or table.concat(Descendants), Class) or "/>\n")
                 
                 return  String
             end
