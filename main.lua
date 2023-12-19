@@ -5,7 +5,6 @@ local Transformations = {
     hLineTo = "h%s", -- x
     vLineTo = "v%s", -- y
     curveTo = "c%s,%s %s,%s %s,%s", -- x1, y1, x2, y2, x, y
-    
     sCurveTo = "s%s,%s %s,%s", -- x2, y2, x, y
     qCurveTo = "q%s,%s %s,%s", -- x1, y1, x, y
     sqCurveTo = "t%s,%s", -- x, y
@@ -15,6 +14,9 @@ local Transformations = {
 
 local Element
 function Element(Parent, Indent)
+    local Parent = Parent or {}
+    local Indent = Indent or 0
+
     return function(Class, Value)
         local Object = {}
         local Children = {}
@@ -46,7 +48,7 @@ function Element(Parent, Indent)
 
                 local String = string.format(string.gsub("\t<%s", "\t", string.rep("\t", Indent)), Class)
                 String = String .. (#Attributes > 0 and (" " .. table.concat(Attributes, " ")) or "")
-                String = String .. ((#Children > 0 or Value) and string.format(string.gsub(">\n%s\t</%s>\n", "\t", string.rep("\t", Indent)), Value and Value or table.concat(Descendants), Class) or "/>\n")
+                String = String .. ((#Children > 0 or Value) and (Value and string.format(">%s</%s>\n", Value, Class) or string.format(string.gsub(">\n%s\t</%s>\n", "\t", string.rep("\t", Indent)), table.concat(Descendants), Class)) or "/>\n")
                 
                 return  String
             end
@@ -56,21 +58,7 @@ end
 
 return {
     new = function()
-        local svg = {}
-
-        return setmetatable({
-            new = Element(svg, 1)
-        }, {
-            __tostring = function()
-                local Objects = {}
-
-                for _, Object in next, svg do
-                    table.insert(Objects, tostring(Object))
-                end
-
-                return string.format("<svg>\n%s</svg>", table.concat(Objects))
-            end
-        })
+        return Element()("svg")
     end,
     path = {
         new = function()
