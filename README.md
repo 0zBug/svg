@@ -1,3 +1,5 @@
+documentation coming soon™️
+
 ```lua
 local svg = require("svg")
 local Drawing = svg.new()
