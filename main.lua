@@ -1,16 +1,18 @@
 
 local Transformations = {
-    moveTo = "m%s,%s", -- x, y
-    lineTo = "l%s,%s", -- x, y
-    hLineTo = "h%s", -- x
-    vLineTo = "v%s", -- y
-    curveTo = "c%s,%s %s,%s %s,%s", -- x1, y1, x2, y2, x, y
-    sCurveTo = "s%s,%s %s,%s", -- x2, y2, x, y
-    qCurveTo = "q%s,%s %s,%s", -- x1, y1, x, y
-    sqCurveTo = "t%s,%s", -- x, y
-    archTo = "a%s,%s %s %s,%s %s,%s", -- rx, ry, rotation, largeFlag, sweepFlag, x, y
-    close = "z"
+    moveTo = "M%s,%s", -- x, y
+    lineTo = "L%s,%s", -- x, y
+    hLineTo = "H%s", -- x
+    vLineTo = "V%s", -- y
+    curveTo = "C%s,%s %s,%s %s,%s", -- x1, y1, x2, y2, x, y
+    sCurveTo = "S%s,%s %s,%s", -- x2, y2, x, y
+    qCurveTo = "Q%s,%s %s,%s", -- x1, y1, x, y
+    sqCurveTo = "T%s,%s", -- x, y
+    archTo = "A%s,%s %s %s,%s %s,%s", -- rx, ry, rotation, largeFlag, sweepFlag, x, y
+    close = "Z"
 }
+
+local time = 0
 
 local Element
 function Element(Parent, Indent)
@@ -25,9 +27,28 @@ function Element(Parent, Indent)
         
         local new = Element(Children, Indent + 1)
 
+        local _index = {
+            new = new,
+            animate = function(Duration, Repeat, Attribute, Values)
+                local animate = Object.new("animate")
+                animate.dur = Duration
+                animate.repeatCount = Repeat == 0 and "indefinite" or Repeat
+                animate.attributeName = Attribute
+                animate.values = table.concat(Values, ";")
+                animate.begin = time
+            end,
+            animateMotion = function(Duration, Repeat, Path)
+                local animateMotion = Object.new("animateMotion")
+                animateMotion.dur = Duration
+                animateMotion.repeatCount = Repeat == 0 and "indefinite" or Repeat
+                animateMotion.path = Path
+                animateMotion.begin = time
+            end
+        }
+
         return setmetatable(Object, {
             __index = function(self, index)
-                return (index == "new") and new or rawget(self, index)
+                return _index[index] and _index[index] or rawget(self, index)
             end,
             __newindex = function(self, index, value)
                 rawset(self, index:gsub("_", "-"), value)
@@ -77,5 +98,8 @@ return {
                 end
             })
         end
-    }
+    },
+    wait = function(wait)
+        time = time + wait
+    end
 }
